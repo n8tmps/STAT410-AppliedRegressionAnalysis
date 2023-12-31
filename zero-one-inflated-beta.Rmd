@@ -1,0 +1,31 @@
+---
+title: "Zero-One-Inflated Beta Regression"
+output: html_notebook
+---
+
+```{r}
+lab.data<- read.csv(file="C:/Users/ntlmp/Desktop/Data_for_Exercises/Exercise7.9Data.csv", header=TRUE, sep=",")
+
+#rescaling variable 
+lab.data$altitudeK<- lab.data$altitude/1000 
+ 
+#fitting zero-one-inflated beta model 
+library(gamlss) 
+summary(fitted.model<- gamlss(germrate ~ altitudeK,  mu.link="logit", nu.formula 
+= ~ EC, nu.link="log", tau.formula = ~ soiltemp, tau.link="log", data=lab.data,  
+family=BEINF))
+
+#checking model fit 
+null.model<- gamlss(germrate ~ 1, mu.link="logit", nu.formula = ~ 1, 
+nu.link="log", tau.formula = ~ 1, tau.link="log", data=lab.data, family=BEINF) 
+deviance<- -2*(logLik(null.model)-logLik(fitted.model))
+pvalue<- pchisq(deviance, df=3, lower.tail=F)
+cat("Deviance:", deviance, "\npvalue:", pvalue)
+
+
+#using fitted model for prediction 
+param<- predictAll(fitted.model, newdata = data.frame(EC=1.5, soiltemp=68, 
+altitudeK=0.95), type="response") 
+print((param$tau+param$mu)/(1+param$nu+param$tau))
+```
+

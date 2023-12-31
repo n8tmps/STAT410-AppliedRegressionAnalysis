@@ -1,0 +1,23 @@
+---
+title: "Generalized Logit for Nominal Response"
+output: html_notebook
+---
+
+```{r}
+#fitting generalized logit model
+ankle.data<- read.csv(file="C:/Users/ntlmp/Desktop/Data_for_Exercises/Exercise4.5Data.csv", header= TRUE, sep=",") 
+#specifying reference categories
+condition.rel<- relevel(factor(ankle.data$condition), ref="sprained") 
+gender.rel<- relevel(factor(ankle.data$gender), ref="female") 
+#running the model
+library(nnet)
+summary(fitted.model<- multinom(condition.rel ~ age + gender.rel,
+data=ankle.data))
+#checking model fit
+summary(null.model<- multinom(condition.rel ~ 1, data=ankle.data))
+print(deviance<- deviance(null.model)-deviance(fitted.model))
+print(p.value<- pchisq(deviance, df=4, lower.tail = FALSE))
+#using fitted model for prediction
+print(predict(fitted.model, data.frame(age=9, gender.rel="female"), type="prob"))
+```
+

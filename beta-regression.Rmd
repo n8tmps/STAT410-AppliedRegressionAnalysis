@@ -1,0 +1,28 @@
+---
+title: "Beta Regression Model"
+output: html_notebook
+---
+
+```{r}
+hospitals.data<- read.csv(file="C:/Users/ntlmp/Desktop/Data_for_Exercises/Exercise7.3Data.csv", header=TRUE, sep=",") 
+ 
+#computing response and specifying reference levels 
+prophospitalized<- hospitals.data$perchospitalized/100 
+location.rel<- relevel(factor(hospitals.data$location), ref="urban") 
+type.rel<- relevel(factor(hospitals.data$type), ref="private") 
+ 
+#fitting beta regression model 
+library(betareg) 
+summary(fitted.model <- betareg(prophospitalized ~ location.rel + type.rel + nbeds, data=hospitals.data, link="logit"))
+
+# checking model fit
+null.model <- betareg(prophospitalized ~ 1, data=hospitals.data, link="logit")
+deviance = -2*(logLik(null.model) - logLik(fitted.model))
+pvalue = pchisq(deviance, df=3, lower.tail=F)
+cat("\nDeviance:", deviance, "\npvalue:", pvalue)
+
+#using fitted model for prediction 
+print(predict(fitted.model, data.frame(location.rel="rural", type.rel="public", 
+nbeds=50))) 
+```
+

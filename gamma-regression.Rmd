@@ -1,0 +1,23 @@
+---
+title: "Gamma Regression"
+output: html_notebook
+---
+
+```{r}
+jobscore.data<- read.csv(file="C:/Users/ntlmp/Desktop/Data_for_Exercises/Exercise2.2Data.csv", header=TRUE, sep=",")
+#rescaling values and setting references
+desgn.rel<- relevel(factor(jobscore.data$desgn), ref="staff")
+priorQI.rel<- relevel(factor(jobscore.data$priorQI), ref="no")
+score<- jobscore.data$score/100
+#fitting gamma regression model
+summary(fitted.model<- glm(score ~ desgn.rel + wrkyrs + priorQI.rel, 
+data=jobscore.data, family=Gamma(link=log)))
+#checking model fit
+null.model<- glm(score ~ 1, data=jobscore.data, family=Gamma(link=log))
+print(deviance<- -2*(logLik(null.model)-logLik(fitted.model)))
+print(p.value<- pchisq(deviance,4,lower.tail=FALSE))
+#using fitted model for prediction
+print(predict(fitted.model, data.frame(desgn.rel="nurse", wrkyrs=7, 
+priorQI.rel="yes"), type="response"))
+```
+

@@ -1,0 +1,24 @@
+---
+title: "Zero-inflated Negative Binomial Regression Model"
+output: html_notebook
+---
+
+```{r}
+insurance.data<- read.csv(file="C:/Users/ntlmp/Desktop/Data_for_Exercises/Exercise6.6Data.csv", header=TRUE, sep=",") 
+#specifying reference level
+gender.rel<- relevel(factor(insurance.data$gender), ref="M")
+#fitting zero-inflated negative binomial model
+library(pscl)
+summary(fitted.model<- zeroinfl(nclaimspast5ys ~ age + gender.rel |
+nclaimsprev5ys, data=insurance.data, dist="negbin"))
+
+#checking model fit
+null.model<- zeroinfl(nclaimspast5ys ~ 1, data=insurance.data, dist="negbin") 
+print(deviance<- -2*(logLik(null.model)-logLik(fitted.model)))
+print(p.value<- pchisq(deviance, df=3, lower.tail = FALSE))
+
+#using fitted model for prediction
+print(predict(fitted.model, data.frame(nclaimsprev5ys=0, age=55,
+gender.rel="F")))
+```
+

@@ -1,0 +1,44 @@
+---
+title: "Box-Cox Power Transformation"
+output: html_notebook
+---
+
+```{r}
+jobscore.data<- read.csv(file="C:/Users/ntlmp/Desktop/Data_for_Exercises/Exercise2.2Data.csv", header=TRUE, sep=",")
+#running normality check of response
+library(rcompanion)
+plotNormalHistogram(jobscore.data$score)
+shapiro.test(jobscore.data$score)
+#creating indicator variables and rescaling score
+desgn.rel<- relevel(factor(jobscore.data$desgn), ref="staff")
+priorQI.rel<- relevel(factor(jobscore.data$priorQI), ref="no")
+score<- jobscore.data$score/100
+#finding optimal lambda for Box-Cox transformation
+library(MASS)
+BoxCox.fit<- boxcox(score ~ desgn.rel + wrkyrs + priorQI.rel, 
+data=jobscore.data, lambda=seq(-3,3,1/4), interp = FALSE)
+BoxCox.data<- data.frame(BoxCox.fit$x, BoxCox.fit$y)
+ordered.data<- BoxCox.data[with(BoxCox.data, order(-BoxCox.fit.y)),]
+ordered.data[1,]
+#applying Box-Cox transformation with lambda=-1 
+score.tr<- 1-(1/score)
+#running normality check of transformed response
+plotNormalHistogram(score.tr)
+shapiro.test(score.tr)
+#fitting general linear model to transformed response
+summary(fitted.model<- glm(score.tr ~ desgn.rel + wrkyrs + priorQI.rel, 
+data=jobscore.data, family=gaussian(link = identity)))
+#outputting estimated sigma
+sigma(fitted.model)
+#checking model fit
+null.model<- glm(score.tr ~ 1, family = gaussian(link=identity))
+print(deviance<- -2*(logLik(null.model)-logLik(fitted.model)))
+print(p.value<- pchisq( deviance, df=4, lower.tail = FALSE))
+#using fitted model for prediction
+pscore.tr<- predict(fitted.model, data.frame(desgn.rel="nurse", wrkyrs=7, 
+priorQI.rel="yes"))
+print(100/(1-pscore.tr))
+
+
+```
+

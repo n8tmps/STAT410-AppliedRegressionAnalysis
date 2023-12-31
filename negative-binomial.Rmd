@@ -1,0 +1,24 @@
+---
+title: "Negative Binomial Regression Model"
+output: html_notebook
+---
+
+```{r}
+mussels.data<- read.csv(file="C:/Users/ntlmp/Desktop/Data_for_Exercises/Exercise6.2Data.csv", header=TRUE, sep=",") 
+#specifying reference level
+feeding.level.rel<- relevel(factor(mussels.data$feeding.level), ref="high")
+#fitting negative binomial model
+library(MASS)
+summary(fitted.model<- glm.nb(ndead.mussels ~ max.temp + min.temp 
++ feeding.level.rel, data=mussels.data))
+
+#checking model fit
+null.model<- glm.nb(ndead.mussels ~ 1, data = mussels.data)
+print(deviance<- -2*(logLik(null.model)-logLik(fitted.model)))
+print(p.value<- pchisq(deviance, df=4, lower.tail = FALSE))
+
+#using fitted model for prediction
+print(predict(fitted.model, data.frame(max.temp=75, min.temp=60, 
+feeding.level.rel="high"), type="response"))
+```
+

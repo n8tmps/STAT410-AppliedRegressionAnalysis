@@ -1,0 +1,40 @@
+---
+title: "Poisson, Zero-truncated Poisson"
+output: html_notebook
+---
+
+```{r}
+autoinsurance.data<- read.csv(file="C:/Users/ntlmp/Desktop/Data_for_Exercises/Exercise5.2Data.csv", header=TRUE, 
+sep=",") 
+gender.rel<- relevel(factor(autoinsurance.data$gender), ref="F")
+#fitting Poisson regression model
+summary(fitted.model<- glm(naccidents ~ gender.rel + age + miles, 
+data=autoinsurance.data, family=poisson(link=log)))
+#checking model fit
+null.model<- glm(naccidents ~ 1, data=autoinsurance.data,
+family=poisson(link=log))
+print(deviance<- -2*(logLik(null.model)-logLik(fitted.model)))
+print(p.value<- pchisq(deviance, df=3, lower.tail = FALSE))
+#using fitted model for prediction
+print(predict(fitted.model, data.frame(gender.rel="F", age=35, miles=100), 
+type="response"))
+```
+
+```{r}
+#eliminating zeros
+autoinsurance.data<- autoinsurance.data[which(autoinsurance.data$naccidents != 
+0),]
+#fitting zero-truncated Poisson model
+library(VGAM)
+summary(fitted.model<- vglm(naccidents ~ gender + age + miles, 
+data=autoinsurance.data, family = pospoisson()))
+#checking model fit
+null.model<- vglm(naccidents ~ 1, data=autoinsurance.data, family = pospoisson())
+print(deviance<- -2*(logLik(null.model)-logLik(fitted.model)))
+print(p.value<- pchisq(deviance, df=3, lower.tail = FALSE))
+#using fitted model for prediction
+print(predict(fitted.model, data.frame(gender="F", age=35, miles=100), 
+type="response"))
+```
+
+

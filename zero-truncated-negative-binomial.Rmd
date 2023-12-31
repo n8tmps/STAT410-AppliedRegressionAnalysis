@@ -1,0 +1,24 @@
+---
+title: "Zero-truncated Negative Binomial Regression Model"
+output: html_notebook
+---
+
+```{r}
+vlogs.data<- read.csv(file="C:/Users/ntlmp/Desktop/Data_for_Exercises/Exercise6.5Data.csv", header=TRUE, sep=",")
+#specifying reference level
+type.rel<- relevel(factor(vlogs.data$type), ref="fashion")
+#fitting zero-truncated negative binomial model
+library(VGAM)
+summary(fitted.model<- vglm(nnewvideos ~ nvideos + nsubscr + nviews + type.rel, 
+data=vlogs.data, family = posnegbinomial()))
+
+#checking model fit
+null.model<- vglm(nnewvideos ~ 1, data = vlogs.data, family=posnegbinomial())
+print(deviance<- -2*(logLik(null.model)-logLik(fitted.model)))
+print(p.value<- pchisq(deviance, df=8, lower.tail = FALSE))
+
+#using fitted model for prediction
+print(predict(fitted.model, data.frame(nvideos=87, nsubscr=50, nviews=254, 
+type.rel="science"), type="response"))
+```
+

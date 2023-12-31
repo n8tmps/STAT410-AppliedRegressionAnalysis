@@ -1,0 +1,25 @@
+---
+title: "Hurdle Negative Binomial Regression Model"
+output: html_notebook
+---
+
+```{r}
+insurance.data<- read.csv(file="C:/Users/ntlmp/Desktop/Data_for_Exercises/Exercise6.6Data.csv", header=TRUE, sep=",")
+#specifying reference level
+gender.rel<- relevel(factor(insurance.data$gender), ref="M")
+#fitting hurdle negative binomial model
+library(pscl)
+summary(fitted.model<- hurdle(nclaimspast5ys ~ age + gender.rel | nclaimsprev5ys, 
+data=insurance.data, dist="negbin", zero.dist = "binomial", link="logit"))
+
+#checking model fit
+null.model<- hurdle(nclaimspast5ys ~ 1, data=insurance.data, dist="negbin", 
+zero.dist="binomial", link="logit") 
+print(deviance<- -2*(logLik(null.model)-logLik(fitted.model)))
+print(p.value<- pchisq(deviance, df=3, lower.tail = FALSE))
+
+#using fitted model for prediction
+print(predict(fitted.model, data.frame(nclaimsprev5ys=0, age=55,
+gender.rel="F")))
+```
+

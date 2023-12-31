@@ -1,0 +1,27 @@
+---
+title: "One-Inflated Beta Regression"
+output: html_notebook
+---
+
+```{r}
+sales.data<- read.csv(file="C:/Users/ntlmp/Desktop/Data_for_Exercises/Exercise7.8Data.csv", header=TRUE, sep=",") 
+ 
+#specifying reference level 
+sales.data$gender.rel<- relevel(factor(sales.data$gender), ref="M") 
+ 
+#fitting one-inflated beta model 
+library(gamlss) 
+summary(fitted.model<- gamlss(propsales ~ gender.rel + bonus, mu.link="logit", 
+nu.formula = ~ expyr, nu.link="logit", data=sales.data, family=BEOI))
+
+# checking model fit
+null.model<- gamlss(propsales ~ 1, mu.link="logit", nu.formula = ~ 1, nu.link="logit", data=sales.data, family=BEOI)
+deviance<- -2*(logLik(null.model)-logLik(fitted.model))
+p.value<- pchisq(deviance, df=3, lower.tail=F)
+cat("Deviance:", deviance, "\npvalue:", p.value)
+
+# using fitted model for prediction
+param <- predictAll(fitted.model, newdata=data.frame(expyr=3, gender.rel="M", bonus=1.5), type="response")
+print(param$nu+(1-param$nu)*param$mu)
+```
+

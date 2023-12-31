@@ -1,0 +1,34 @@
+---
+title: "Generalized Linear Model"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+
+df = read_csv("C:/Users/ntlmp/Desktop/Data_for_Exercises/Exercise1.2Data.csv")
+
+# building generalized linear model
+library(rcompanion)
+# checking for normality
+plotNormalHistogram(df$EWL)
+shapiro.test(df$EWL)
+# specifying reference levels
+drug.rel = relevel(factor(df$drug), ref="A")
+gender.rel = relevel(factor(df$gender), ref="M")
+# fitting general linear model
+fitted.model = glm(EWL ~ drug.rel + age + gender.rel, data = df, family=gaussian(link=identity))
+summary(fitted.model)
+# outputting estimated sigma
+s = sigma(fitted.model)
+cat("Estimated sigma:", s)
+# checking for goodness-of-fit
+null.model= glm(EWL ~ 1, data=df, family=gaussian(link=identity))
+deviance = -2 * (logLik(null.model) - logLik(fitted.model))
+p.value = pchisq(deviance, df=3, lower.tail=FALSE)
+cat("Deviance:", deviance, "\npvalue:", p.value)
+# using the fitted model for prediction
+EWL.prediction = predict(fitted.model, data.frame(drug.rel="A",age=35, gender.rel="M"))
+print(EWL.prediction)
+```
+

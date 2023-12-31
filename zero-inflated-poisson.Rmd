@@ -1,0 +1,30 @@
+---
+title: "Zero-inflated Poisson Regression Model"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+healthsurvey.data<- read.csv(file="C:/Users/ntlmp/Desktop/Data_for_Exercises/Exercise5.10Data.csv", header = TRUE, 
+sep=",") 
+#setting reference levels
+gender.rel<- relevel(factor(healthsurvey.data$gender), ref="F")
+smoking.rel<- relevel(factor(healthsurvey.data$smoking), ref="yes")
+#fitting zero-inflated Poisson model
+library(pscl)
+summary(fitted.model<- zeroinfl(nattacks ~ BMI + gender.rel | age + smoking.rel, 
+data=healthsurvey.data))
+
+#checking model fit
+null.model<- zeroinfl(nattacks ~ 1, data=healthsurvey.data)
+print(deviance<- -2*(logLik(null.model)-logLik(fitted.model)))
+print(p.value<- pchisq(deviance, df=4, lower.tail = FALSE))
+
+#using fitted model for prediction
+print(predict(fitted.model, data.frame(BMI=21.2, age=60, gender.rel="M", 
+smoking.rel="yes")))
+```
+

@@ -1,0 +1,33 @@
+---
+title: "Zero-inflated Beta Regression Model"
+output: html_notebook
+---
+
+```{r}
+realestate.data<- read.csv(file="C:/Users/ntlmp/Desktop/Data_for_Exercises/Exercise7.5Data.csv", header= TRUE, 
+sep=",") 
+ 
+#computing response and rescaling predictors 
+realestate.data$propsold<- realestate.data$percsold/100 
+realestate.data$avgprice.res<- realestate.data$avgprice/100 
+realestate.data$nhouses.res<- realestate.data$nhouses/100 
+ 
+#fitting zero-inflated beta regression model 
+library(gamlss) 
+summary(fitted.model<- gamlss(propsold ~ avgprice.res + nhouses.res, 
+mu.link="logit", nu.formula = ~ age, nu.link="logit", data=realestate.data, 
+family = BEZI))
+
+# checking model fit
+null.model<- gamlss(propsold ~ 1, mu.link="logit", nu.formula= ~ 1, 
+nu.link="logit", data=realestate.data, family=BEZI) 
+deviance<- -2*(logLik(null.model)-logLik(fitted.model))
+p.value<- pchisq(deviance, df=3, lower.tail = FALSE)
+cat("Deviance:", deviance, "\npvalue:", p.value)
+
+#using fitted model for prediction 
+param.pred<- predictAll(fitted.model, newdata=data.frame(avgprice.res=4.5,  
+nhouses.res=3, age=50), type="response") 
+print((1-param.pred$nu)*param.pred$mu)
+```
+

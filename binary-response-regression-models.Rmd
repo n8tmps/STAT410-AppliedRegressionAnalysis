@@ -1,0 +1,90 @@
+---
+title: "Binary Logistic, Binary Probit, Binary Cumulative Log-Log"
+output: html_notebook
+---
+
+```{r}
+df = read.csv("C:\\Users\\ntlmp\\Desktop\\Data_for_Exercises\\Exercise3.2Data.csv")
+# fitting logistic model
+# setting reference categories
+gender.rel = relevel(factor(df$gender), ref="F")
+medication.rel = relevel(factor(df$medication), ref="B")
+# running the model
+fitted.model = glm(relief ~ gender.rel + age + medication.rel, data=df, family=binomial(link=logit))
+summary(fitted.model)
+
+# computing AICC
+p = 4
+n = 30
+AICC = -2 * logLik(fitted.model) + 2*p*n/(n-p-1)
+print(AICC)
+
+# outputting BIC
+BIC(fitted.model)
+
+# checking model fit
+null.model = glm(relief ~ 1, data=df, family=binomial(link=logit))
+deviance = -2 * (logLik(null.model) - logLik(fitted.model))
+print(deviance)
+
+p.value = pchisq(deviance, 3, lower.tail=F)
+print(p.value)
+
+#using fitted model for prediction
+pred1 = predict(fitted.model, data.frame(gender.rel="F", age=50,
+medication.rel="A"), type="response")
+print(pred1)
+```
+
+```{r}
+# fitting probit model
+fitted.model_p = glm(relief ~ gender.rel + age + medication.rel, data=df, family=binomial(link=probit))
+summary(fitted.model_p)
+
+# computing AICC
+p = 4
+n = 30
+AICC = -2*logLik(fitted.model_p) + 2*p*n/(n-p-1)
+print(AICC)
+# outputting BIC
+BIC(fitted.model_p)
+
+# checking model fit
+null.model_p <-glm(relief ~ 1, data=df, family=binomial(link=probit))
+print(deviance<- -2*(logLik(null.model_p)-logLik(fitted.model_p)))
+p.value = pchisq(deviance, 3, lower.tail=F)
+print(p.value)
+
+# using fitted model for prediction
+pred2 = predict(fitted.model_p, data.frame(gender.rel="F", age=50, medication.rel="A"), type="response")
+print(pred2)
+```
+
+```{r}
+# fitting complementary log log model
+fitted.model_c = glm(relief ~ gender.rel + age + medication.rel, data=df, family=binomial(link=cloglog))
+summary(fitted.model_c)
+
+# computing AICC
+p = 4
+n = 30
+AICC = -2 * logLik(fitted.model_c) + 2*p*n/(n-p-1)
+print(AICC)
+
+# outputting BIC
+BIC(fitted.model_c)
+
+# checking model fit
+null.model_c = glm(relief ~ 1, data=df, family=binomial(link=cloglog))
+deviance = -2*(logLik(null.model_c) - logLik(fitted.model_c))
+print(deviance)
+
+p.value = pchisq(deviance, 3, lower.tail=F)
+print(p.value)
+
+# using fitted model for prediction
+pred3 = predict(fitted.model_c, data.frame(gender.rel="F", age=50,
+medication.rel="A"), type="response")
+print(pred3)
+```
+

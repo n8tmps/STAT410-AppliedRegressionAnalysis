@@ -1,0 +1,65 @@
+---
+title: "Cumulative logit, cumulative probit, cumulative complementary log-log"
+output: html_notebook
+---
+
+```{r}
+#fitting cumulative logit model
+admission.data<- read.csv(file="C:/Users/ntlmp/Desktop/Data_for_Exercises/Exercise4.1Data.csv", header= TRUE, sep=",")
+admission.data$status = as.factor(admission.data$status)
+#rescaling predictor 
+GMAT.res<- admission.data$GMAT/100
+#running the model
+library(ordinal)
+summary(fitted.model<- clm(status ~ GPA + GMAT.res, data=admission.data, 
+link="logit"))
+#computing AICC
+p<- 4 
+n<- 42
+print(AICC<- -2*logLik(fitted.model)+2*p*n/(n-p-1))
+#outputting BIC
+BIC(fitted.model)
+#checking model fit
+null.model<- clm(status ~ 1, data=admission.data, link="logit")
+print(deviance<- -2*(logLik(null.model)-logLik(fitted.model)))
+print(p.value<- pchisq(deviance, df=2, lower.tail = FALSE))
+#using fitted model for prediction 
+print(predict(fitted.model, data.frame(GPA=3.1, GMAT.res=5.50), type="prob"))
+```
+```{r}
+#running the model
+library(ordinal)
+summary(fitted.model<- clm(status ~ GPA + GMAT.res, data=admission.data, 
+link="probit"))
+#computing AICC
+p<- 4 
+n<- 42
+print(AICC<- -2*logLik(fitted.model)+2*p*n/(n-p-1))
+#outputting BIC
+BIC(fitted.model)
+#checking model fit
+null.model<- clm(status ~ 1, data=admission.data, link="probit")
+print(deviance<- -2*(logLik(null.model)-logLik(fitted.model)))
+print(p.value<- pchisq(deviance, df=2, lower.tail = FALSE))
+#using fitted model for prediction 
+print(predict(fitted.model, data.frame(GPA=3.1, GMAT.res=5.50), type="prob"))
+```
+```{r}
+#running the model
+library(ordinal)
+summary(fitted.model<- clm(status ~ GPA + GMAT.res, data=admission.data, 
+link="cloglog"))
+#computing AICC
+p<- 4 
+n<- 42
+print(AICC<- -2*logLik(fitted.model)+2*p*n/(n-p-1))
+#outputting BIC
+BIC(fitted.model)
+#checking model fit
+null.model<- clm(status ~ 1, data=admission.data, link="cloglog")
+print(deviance<- -2*(logLik(null.model)-logLik(fitted.model)))
+print(p.value<- pchisq(deviance, df=2, lower.tail = FALSE))
+#using fitted model for prediction 
+print(predict(fitted.model, data.frame(GPA=3.1, GMAT.res=5.50), type="prob"))
+```
+

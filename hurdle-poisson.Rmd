@@ -1,0 +1,21 @@
+---
+title: "Hurdle Poisson Regression Model"
+output: html_notebook
+---
+
+```{r}
+adherence.data<- read.csv(file="C:/Users/ntlmp/Desktop/STUDY_MATERIALS_STAT410F23/Data_for_Exercises/Exercise5.13Data.csv", header=TRUE, sep=",")
+gender.rel<- relevel(factor(adherence.data$gender), ref="M")
+#fitting hurdle Poisson model
+library(pscl)
+summary(fitted.model<- hurdle(ndaysnomeds ~ gender.rel + age | nothermeds, 
+data=adherence.data, dist="poisson", zero.dist = "binomial", link="logit"))
+#checking model fit
+null.model<- hurdle(ndaysnomeds ~ 1, data=adherence.data, dist="poisson", 
+zero.dist="binomial", link="logit") 
+print(deviance<- -2*(logLik(null.model)-logLik(fitted.model)))
+print(p.value<- pchisq(deviance, df=3, lower.tail = FALSE))
+#using fitted model for prediction
+print(predict(fitted.model, data.frame(gender.rel="M", age=78, nothermeds=0)))
+```
+
