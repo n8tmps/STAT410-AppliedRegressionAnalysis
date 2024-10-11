@@ -1,3 +1,4 @@
+** Normal Distribution **
 1. Generalized Linear Model
 
 **Right-skewed Distribution**
