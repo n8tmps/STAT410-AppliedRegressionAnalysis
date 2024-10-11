@@ -1,5 +1,7 @@
 
 # STAT410 Applied Regression Analysis
+Fundamental concepts and applications of regression analysis. Simple linear regression: inference, prediction, residual analysis, outlier detection, transformations. Multiple linear regression: influence diagnostics, multicollinearity, variable selection, simultaneous estimation, and inference, validation techniques. Logistic Regression; Poisson Regression; ANOVA; ANCOVA.
+
 ## Normal Distribution
 1. Generalized Linear Model
 
