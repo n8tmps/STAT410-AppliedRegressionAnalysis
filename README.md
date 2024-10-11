@@ -1,4 +1,5 @@
-STAT410 Applied Regression Analysis
+
+# STAT410 Applied Regression Analysis
 ## Normal Distribution
 1. Generalized Linear Model
 
